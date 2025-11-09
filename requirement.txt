@@ -4,8 +4,8 @@ optuna
 matplot
 seaborn
 Flask
-sklearn
+scikit-learn
 xgboost
 lightgbm
 joblib
-pickel
+pickle
