@@ -7,21 +7,17 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <!-- Header -->
-  <header class="header">
-    <h1>SpamDetector<span>.AI</span></h1>
-    <p>Instantly identify spam messages with advanced AI precision.</p>
-  </header>
+  <!-- Top Tagline -->
+  <div class="tagline">💬 Spam Detection AI</div>
 
-  <!-- Main Section -->
-  <main class="container">
+  <div class="wrapper">
     <div class="card">
-      <h2>Analyze a Message</h2>
-      <p class="desc">Paste your message below to detect spam confidently.</p>
+      <h1 class="title">SpamDetector<span>.AI</span></h1>
+      <p class="subtitle">A clean, intelligent way to identify spam instantly.</p>
 
       <form id="spam-form" onsubmit="return false;">
         <textarea id="message" placeholder="Type or paste your message here..." required></textarea>
-        <button type="submit">Analyze</button>
+        <button type="submit">Analyze Message</button>
       </form>
 
       <div id="result-area" style="display:none;">
@@ -30,14 +26,12 @@
         <div id="confidence-bar" class="confidence-bar"></div>
       </div>
     </div>
-  </main>
+  </div>
 
-  <!-- Footer -->
   <footer>
-    <p>© 2025 SpamDetector.AI — Powered by Flask & Machine Learning</p>
+    <p>© 2025 SpamDetector.AI — Built with ❤️ using Flask & ML</p>
   </footer>
 
-  <!-- JavaScript for AJAX prediction -->
   <script>
   document.getElementById("spam-form").addEventListener("submit", async function() {
     const message = document.getElementById("message").value.trim();
@@ -46,20 +40,20 @@
     const confBar = document.getElementById("confidence-bar");
     const resultArea = document.getElementById("result-area");
 
+    // Reset
+    resultBox.innerHTML = "";
+    confBox.innerHTML = "";
+    confBar.style.width = "0%";
+    resultArea.style.display = "block";
+
     if (!message) {
-      resultBox.innerHTML = "Please enter a message.";
+      resultBox.innerHTML = "⚠️ Please enter a message.";
       resultBox.className = "result neutral";
-      resultArea.style.display = "block";
-      confBox.innerHTML = "";
-      confBar.style.width = "0";
       return;
     }
 
     resultBox.innerHTML = "Analyzing...";
     resultBox.className = "result neutral";
-    resultArea.style.display = "block";
-    confBox.innerHTML = "";
-    confBar.style.width = "0";
 
     try {
       const res = await fetch("/predict_json", {
@@ -69,33 +63,25 @@
       });
 
       const data = await res.json();
+
       if (data.error) {
-        resultBox.innerHTML = "Error: " + data.error;
+        resultBox.innerHTML = "❌ Error: " + data.error;
         resultBox.className = "result error";
         return;
       }
 
-      resultBox.innerHTML = `The message is ${data.prediction}`;
+      resultBox.innerHTML = `The message is <strong>${data.prediction}</strong>`;
       resultBox.className = `result ${data.prediction === "Spam" ? "spam" : "not-spam"}`;
 
       if (data.confidence) {
+        const confValue = parseFloat(data.confidence);
         confBox.innerHTML = `Confidence: <strong>${data.confidence}</strong>`;
         confBox.className = `confidence-box ${data.prediction === "Spam" ? "spam" : "not-spam"}`;
-
-        // Progress bar
-        const confValue = parseFloat(data.confidence);
-        confBar.style.width = confValue + "%";
         confBar.className = `confidence-bar ${data.prediction === "Spam" ? "spam" : "not-spam"}`;
-      } else {
-        confBox.innerHTML = "";
-        confBar.style.width = "0";
+        confBar.style.width = confValue + "%";
       }
-
-      resultArea.style.display = "block";
-      resultArea.scrollIntoView({ behavior: "smooth", block: "center" });
-
     } catch (err) {
-      resultBox.innerHTML = "Error: " + err.message;
+      resultBox.innerHTML = "❌ Error: " + err.message;
       resultBox.className = "result error";
     }
   });
